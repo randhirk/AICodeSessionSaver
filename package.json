@@ -1,0 +1,38 @@
+{
+  "name": "aicode-session-saver",
+  "version": "0.1.0",
+  "description": "Capture, index, encode, and resume AI coding CLI sessions (Claude Code, Cursor, Codex, and more)",
+  "type": "module",
+  "bin": {
+    "aiss": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/cli.ts",
+    "start": "node dist/cli.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "claude-code",
+    "cursor",
+    "codex",
+    "ai-cli",
+    "session",
+    "resume",
+    "transcript"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "chokidar": "^4.0.3",
+    "commander": "^13.1.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  }
+}
