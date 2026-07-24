@@ -1,6 +1,7 @@
 import { mkdirSync, readFileSync, writeFileSync, appendFileSync, existsSync } from "node:fs";
 import { homedir } from "node:os";
-import { basename, dirname, join } from "node:path";
+import { basename, join } from "node:path";
+import { buildMemoryPrompt, readSessionSummaryMarkdown } from "./memory.js";
 import type { Provider, UnifiedSession } from "./types.js";
 
 function projectHash(cwd: string): string {
@@ -42,10 +43,28 @@ export function buildContextPrompt(session: UnifiedSession, maxMessages = 30): s
   ].join("\n");
 }
 
+function prependProjectMemory(session: UnifiedSession, contextPrompt: string): string {
+  const projectPath = session.projectPath ?? session.cwd;
+  if (!projectPath) return contextPrompt;
+
+  const parts: string[] = [];
+  try {
+    parts.push(buildMemoryPrompt(projectPath, { includeSessions: 3 }).trim());
+  } catch {
+    // Memory not built yet — resume still works with session-only context.
+  }
+  const ownSummary = readSessionSummaryMarkdown(projectPath, session.id);
+  if (ownSummary) {
+    parts.push("## This session summary", ownSummary.trim());
+  }
+  if (!parts.length) return contextPrompt;
+  return `${parts.join("\n\n")}\n\n---\n\n${contextPrompt}`;
+}
+
 export function planResume(session: UnifiedSession, apply = false): ResumePlan {
   const steps: string[] = [];
   let command: string | undefined;
-  const contextPrompt = buildContextPrompt(session);
+  const contextPrompt = prependProjectMemory(session, buildContextPrompt(session));
 
   switch (session.provider) {
     case "claude-code": {

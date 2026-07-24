@@ -105,6 +105,7 @@ npx aiss resume 8dddce78 --context-out continue.md
 |---------|-------------|
 | `aiss providers` | Show detected AI CLI data directories |
 | `aiss sync` | Scan and index all sessions |
+| `aiss sync --with-memory` | Sync and rebuild distilled project memory |
 | `aiss watch` | Auto-sync on transcript file changes |
 | `aiss list` | List indexed sessions |
 | `aiss show <id>` | Full session JSON |
@@ -112,12 +113,35 @@ npx aiss resume 8dddce78 --context-out continue.md
 | `aiss import <file>` | Import bundle into local index |
 | `aiss decode <file>` | Decode bundle to JSON |
 | `aiss resume <id>` | Resume instructions (`--apply` for Claude Code) |
+| `aiss memory build` | Distill project memory + per-session summaries |
+| `aiss memory show` | Print `MEMORY.md` |
+| `aiss memory sessions` | List session summary catalog |
+| `aiss memory show-session <id>` | Print one session summary |
+| `aiss memory prompt` | Inject-ready prompt (`--include-sessions N`) |
+| `aiss memory apply` | Write memory into `CLAUDE.md`, `AGENTS.md`, `.cursor/rules/aiss-memory.mdc` |
+| `aiss memory clear` | Clear AISS-managed memory for a project |
+
+### Cross-session memory
+
+AISS builds a **two-layer distilled memory** (no raw transcript dumps):
+
+1. **Project memory** — decisions, mistakes to avoid, answered Q&A, current status  
+2. **Per-session summaries** — goal, what was done, outcomes, open threads  
+
+Stored under `~/.aicode-session-saver/memory/<projectHash>/`. Use `aiss memory apply` so Claude Code, Cursor, and Codex all load the same shared context.
+
+```bash
+npx aiss sync
+npx aiss memory build --project .
+npx aiss memory apply --project . --include-sessions 5
+```
 
 ## Environment variables
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
-| `AISS_DATA_DIR` | `~/.aicode-session-saver` | Index + bundle storage |
+| `AISS_DATA_DIR` | `~/.aicode-session-saver` | Index + bundle + memory storage |
+| `AISS_MEMORY_AUTO` | — | Set to `1` to rebuild memory on every sync |
 | `AISS_EXTRA_ROOTS` | — | Comma-separated extra transcript directories |
 | `CLAUDE_CONFIG_DIR` | `~/.claude` | Claude Code data root |
 | `CODEX_HOME` | `~/.codex` | Codex CLI data root |
@@ -139,8 +163,10 @@ The file on disk is **gzip-compressed JSON**. Checksum covers all fields except 
 
 ## Roadmap
 
+- [x] Distilled cross-session project memory + per-session summaries
 - [ ] Aider, OpenCode, Gemini CLI adapters
 - [ ] Cursor SQLite adapter (full agent-mode resume with checkpoints)
+- [ ] Optional LLM enrichment for memory summaries
 - [ ] Web UI for cross-session search
 - [ ] Git-synced backup directory
 - [ ] Hook integration (capture on session start/end)

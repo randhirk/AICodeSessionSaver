@@ -3,6 +3,11 @@ import { join } from "node:path";
 import { getAvailableAdapters } from "../adapters/registry.js";
 import { encodeSession } from "../core/encoder.js";
 import { SessionIndex, getBundlesDir } from "../core/index-db.js";
+import {
+  buildMemoryForProjects,
+  discoverProjectPaths,
+  type MemoryBuildResult,
+} from "../core/memory.js";
 import { bundleFilename, readRawFiles } from "../core/resume.js";
 import type { UnifiedSession } from "../core/types.js";
 
@@ -11,9 +16,18 @@ export interface SyncResult {
   indexed: number;
   updated: number;
   sessions: UnifiedSession[];
+  memory?: MemoryBuildResult[];
 }
 
-export async function syncSessions(index = new SessionIndex()): Promise<SyncResult> {
+export interface SyncOptions {
+  withMemory?: boolean;
+  memoryProject?: string;
+}
+
+export async function syncSessions(
+  index = new SessionIndex(),
+  options: SyncOptions = {},
+): Promise<SyncResult> {
   mkdirSync(getBundlesDir(), { recursive: true });
 
   const adapters = getAvailableAdapters();
@@ -41,11 +55,21 @@ export async function syncSessions(index = new SessionIndex()): Promise<SyncResu
     }
   }
 
+  const autoMemory = options.withMemory || process.env.AISS_MEMORY_AUTO === "1";
+  let memory: MemoryBuildResult[] | undefined;
+  if (autoMemory) {
+    const projects = options.memoryProject
+      ? [options.memoryProject]
+      : discoverProjectPaths(allSessions, process.cwd());
+    memory = buildMemoryForProjects(allSessions, projects);
+  }
+
   return {
     discovered: allSessions.length,
     indexed,
     updated,
     sessions: allSessions,
+    memory,
   };
 }
 

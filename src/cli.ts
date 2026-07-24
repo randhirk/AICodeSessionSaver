@@ -1,9 +1,19 @@
 #!/usr/bin/env node
 
 import { readFileSync, writeFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { Command } from "commander";
 import { decodeBundle, decodeFromBase64, encodeSession, encodeToBase64 } from "./core/encoder.js";
 import { SessionIndex } from "./core/index-db.js";
+import {
+  applyProjectMemory,
+  buildProjectMemory,
+  clearProjectMemory,
+  listSessionCatalog,
+  readMemoryMarkdown,
+  readSessionSummaryMarkdown,
+  buildMemoryPrompt,
+} from "./core/memory.js";
 import { planResume } from "./core/resume.js";
 import { findSession, syncSessions } from "./core/sync.js";
 import type { Provider } from "./core/types.js";
@@ -20,9 +30,21 @@ program
 program
   .command("sync")
   .description("Scan installed AI CLIs and index all sessions")
-  .action(async () => {
-    const result = await syncSessions();
+  .option("--with-memory", "Also rebuild distilled project memory")
+  .option("--project <path>", "Limit memory rebuild to this project (with --with-memory)")
+  .action(async (options: { withMemory?: boolean; project?: string }) => {
+    const result = await syncSessions(undefined, {
+      withMemory: options.withMemory,
+      memoryProject: options.project,
+    });
     console.log(`Discovered ${result.discovered} sessions, indexed ${result.indexed}, updated ${result.updated}`);
+    if (result.memory?.length) {
+      for (const mem of result.memory) {
+        console.log(
+          `Memory: ${mem.projectPath} → ${mem.sessionSummaries} summaries (${mem.sessionSummariesUpdated} updated)`,
+        );
+      }
+    }
   });
 
 program
@@ -160,6 +182,111 @@ program
       console.log("\n--- Context prompt (paste into new chat) ---\n");
       console.log(plan.contextPrompt);
     }
+  });
+
+const memory = program.command("memory").description("Distilled project memory across sessions");
+
+memory
+  .command("build")
+  .description("Build project memory + per-session summaries from indexed sessions")
+  .option("--project <path>", "Project path", process.cwd())
+  .action(async (options: { project: string }) => {
+    const project = resolve(options.project);
+    const result = await syncSessions();
+    const built = buildProjectMemory(project, result.sessions);
+    console.log(`Built memory for ${built.projectPath}`);
+    console.log(`  MEMORY.md: ${built.memoryPath}`);
+    console.log(
+      `  Session summaries: ${built.sessionSummaries} (${built.sessionSummariesUpdated} updated)`,
+    );
+  });
+
+memory
+  .command("show")
+  .description("Print project MEMORY.md")
+  .option("--project <path>", "Project path", process.cwd())
+  .action((options: { project: string }) => {
+    const md = readMemoryMarkdown(resolve(options.project));
+    if (!md) {
+      console.error("No memory found. Run: aiss memory build");
+      process.exit(1);
+    }
+    console.log(md);
+  });
+
+memory
+  .command("sessions")
+  .description("List per-session summary catalog")
+  .option("--project <path>", "Project path", process.cwd())
+  .option("-n, --limit <number>", "Max results", "20")
+  .action((options: { project: string; limit: string }) => {
+    const rows = listSessionCatalog(resolve(options.project), Number(options.limit));
+    if (!rows.length) {
+      console.log("No session summaries. Run: aiss memory build");
+      return;
+    }
+    for (const row of rows) {
+      console.log(
+        `${row.id.slice(0, 8)}  ${row.provider.padEnd(12)}  ${row.updatedAt.slice(0, 10)}  ${row.title}`,
+      );
+    }
+  });
+
+memory
+  .command("show-session <id>")
+  .description("Print one session summary")
+  .option("--project <path>", "Project path", process.cwd())
+  .action((id: string, options: { project: string }) => {
+    const md = readSessionSummaryMarkdown(resolve(options.project), id);
+    if (!md) {
+      console.error(`Session summary not found: ${id}`);
+      process.exit(1);
+    }
+    console.log(md);
+  });
+
+memory
+  .command("prompt")
+  .description("Emit inject-ready distilled memory prompt (no raw transcripts)")
+  .option("--project <path>", "Project path", process.cwd())
+  .option("--include-sessions <n>", "Include N newest session summaries (0 = catalog only)", "5")
+  .option("-o, --output <file>", "Write prompt to file")
+  .action((options: { project: string; includeSessions: string; output?: string }) => {
+    const prompt = buildMemoryPrompt(resolve(options.project), {
+      includeSessions: Number(options.includeSessions),
+    });
+    if (options.output) {
+      writeFileSync(options.output, prompt);
+      console.log(`Wrote prompt to ${options.output}`);
+      return;
+    }
+    console.log(prompt);
+  });
+
+memory
+  .command("apply")
+  .description("Write memory into CLAUDE.md, AGENTS.md, and .cursor/rules/aiss-memory.mdc")
+  .option("--project <path>", "Project path", process.cwd())
+  .option("--include-sessions <n>", "Include N newest session summaries (0 = catalog only)", "5")
+  .action((options: { project: string; includeSessions: string }) => {
+    const project = resolve(options.project);
+    const { written } = applyProjectMemory(project, {
+      includeSessions: Number(options.includeSessions),
+    });
+    console.log(`Applied AISS memory to ${project}`);
+    for (const path of written) {
+      console.log(`  • ${path}`);
+    }
+  });
+
+memory
+  .command("clear")
+  .description("Clear AISS-managed memory for a project")
+  .option("--project <path>", "Project path", process.cwd())
+  .option("--all", "Also delete preserved User notes")
+  .action((options: { project: string; all?: boolean }) => {
+    clearProjectMemory(resolve(options.project), Boolean(options.all));
+    console.log(`Cleared memory for ${resolve(options.project)}`);
   });
 
 program
