@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-label="AISS architecture diagram">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a1a1a"/>
+    </marker>
+    <style>
+      .title { font: 700 28px "Helvetica Neue", Helvetica, Arial, sans-serif; fill: #111; }
+      .subtitle { font: 400 14px "Helvetica Neue", Helvetica, Arial, sans-serif; fill: #444; }
+      .box-title { font: 700 16px "Helvetica Neue", Helvetica, Arial, sans-serif; fill: #111; }
+      .box-body { font: 400 13px "Helvetica Neue", Helvetica, Arial, sans-serif; fill: #222; }
+      .label { font: 600 12px "Helvetica Neue", Helvetica, Arial, sans-serif; fill: #333; }
+      .group { fill: #f7f7f5; stroke: #bdbdb7; stroke-width: 1.5; }
+      .card { fill: #ffffff; stroke: #1a1a1a; stroke-width: 1.75; }
+      .accent { fill: #eef3f8; stroke: #1a1a1a; stroke-width: 1.75; }
+      .core { fill: #f3f6ea; stroke: #1a1a1a; stroke-width: 1.75; }
+      .out { fill: #f8f1ea; stroke: #1a1a1a; stroke-width: 1.75; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="720" fill="#ffffff"/>
+  <text x="40" y="48" class="title">Figure 1. AISS architecture</text>
+  <text x="40" y="72" class="subtitle">Provider-agnostic discovery, normalization, portable bundling, and continuation</text>
+
+  <!-- Sources group -->
+  <rect x="40" y="110" width="260" height="480" rx="10" class="group"/>
+  <text x="60" y="140" class="label">AI CODING SOURCES</text>
+
+  <rect x="60" y="160" width="220" height="90" rx="8" class="card"/>
+  <text x="78" y="195" class="box-title">Claude Code</text>
+  <text x="78" y="218" class="box-body">JSONL under projects/</text>
+  <text x="78" y="236" class="box-body">native resume</text>
+
+  <rect x="60" y="275" width="220" height="90" rx="8" class="card"/>
+  <text x="78" y="310" class="box-title">Cursor Agent</text>
+  <text x="78" y="333" class="box-body">agent-transcripts/</text>
+  <text x="78" y="351" class="box-body">context continuation</text>
+
+  <rect x="60" y="390" width="220" height="90" rx="8" class="card"/>
+  <text x="78" y="425" class="box-title">Codex CLI</text>
+  <text x="78" y="448" class="box-body">rollout-*.jsonl</text>
+  <text x="78" y="466" class="box-body">native resume</text>
+
+  <text x="60" y="530" class="box-body">+ extensible adapters</text>
+  <text x="60" y="550" class="box-body">(Aider, OpenCode, &)</text>
+
+  <!-- AISS core group -->
+  <rect x="360" y="110" width="480" height="480" rx="10" class="group"/>
+  <text x="380" y="140" class="label">AISS CORE</text>
+
+  <rect x="390" y="160" width="420" height="70" rx="8" class="accent"/>
+  <text x="410" y="190" class="box-title">Adapters</text>
+  <text x="410" y="212" class="box-body">discover � normalize � unified session model</text>
+
+  <rect x="390" y="255" width="200" height="100" rx="8" class="core"/>
+  <text x="410" y="290" class="box-title">Session Index</text>
+  <text x="410" y="313" class="box-body">metadata search</text>
+  <text x="410" y="331" class="box-body">fingerprints</text>
+
+  <rect x="610" y="255" width="200" height="100" rx="8" class="core"/>
+  <text x="630" y="290" class="box-title">.aiss Encoder</text>
+  <text x="630" y="313" class="box-body">gzip + SHA-256</text>
+  <text x="630" y="331" class="box-body">raw + normalized</text>
+
+  <rect x="390" y="380" width="420" height="90" rx="8" class="accent"/>
+  <text x="410" y="415" class="box-title">Resume Planner + Distilled Memory</text>
+  <text x="410" y="438" class="box-body">native restore where available; else generated context</text>
+  <text x="410" y="456" class="box-body">optional project/session memory for new chats</text>
+
+  <text x="390" y="510" class="box-body">CLI: sync � watch � list � export � import � resume</text>
+  <text x="390" y="530" class="box-body">Local-first storage (~/.aicode-session-saver)</text>
+
+  <!-- Outputs group -->
+  <rect x="900" y="110" width="260" height="480" rx="10" class="group"/>
+  <text x="920" y="140" class="label">DEVELOPER OUTCOMES</text>
+
+  <rect x="920" y="170" width="220" height="85" rx="8" class="out"/>
+  <text x="938" y="205" class="box-title">Search / Browse</text>
+  <text x="938" y="228" class="box-body">list, filter, inspect</text>
+
+  <rect x="920" y="280" width="220" height="85" rx="8" class="out"/>
+  <text x="938" y="315" class="box-title">Portable Bundles</text>
+  <text x="938" y="338" class="box-body">.aiss export / import</text>
+
+  <rect x="920" y="390" width="220" height="100" rx="8" class="out"/>
+  <text x="938" y="425" class="box-title">Continue Work</text>
+  <text x="938" y="448" class="box-body">native CLI resume or</text>
+  <text x="938" y="466" class="box-body">cross-tool context prompt</text>
+
+  <!-- Arrows: sources to adapters -->
+  <line x1="280" y1="205" x2="390" y2="195" stroke="#1a1a1a" stroke-width="1.75" marker-end="url(#arrow)"/>
+  <line x1="280" y1="320" x2="390" y2="195" stroke="#1a1a1a" stroke-width="1.75" marker-end="url(#arrow)"/>
+  <line x1="280" y1="435" x2="390" y2="195" stroke="#1a1a1a" stroke-width="1.75" marker-end="url(#arrow)"/>
+
+  <!-- Adapters to index/encoder -->
+  <line x1="600" y1="230" x2="490" y2="255" stroke="#1a1a1a" stroke-width="1.75" marker-end="url(#arrow)"/>
+  <line x1="600" y1="230" x2="710" y2="255" stroke="#1a1a1a" stroke-width="1.75" marker-end="url(#arrow)"/>
+
+  <!-- Index/encoder to resume -->
+  <line x1="490" y1="355" x2="520" y2="380" stroke="#1a1a1a" stroke-width="1.75" marker-end="url(#arrow)"/>
+  <line x1="710" y1="355" x2="680" y2="380" stroke="#1a1a1a" stroke-width="1.75" marker-end="url(#arrow)"/>
+
+  <!-- Core to outcomes -->
+  <line x1="840" y1="305" x2="920" y2="212" stroke="#1a1a1a" stroke-width="1.75" marker-end="url(#arrow)"/>
+  <line x1="840" y1="305" x2="920" y2="322" stroke="#1a1a1a" stroke-width="1.75" marker-end="url(#arrow)"/>
+  <line x1="840" y1="425" x2="920" y2="440" stroke="#1a1a1a" stroke-width="1.75" marker-end="url(#arrow)"/>
+
+  <text x="40" y="640" class="subtitle">AISS normalizes heterogeneous coding-agent transcripts into one indexed representation, packages checksummed .aiss bundles for</text>
+  <text x="40" y="660" class="subtitle">machine transfer, and resumes work via native provider commands or generated continuation context.</text>
+  <text x="40" y="695" class="subtitle">Suggested caption: Architecture of AI Code Session Saver (AISS): adapters feed a unified index and portable encoder; developers search, transfer, and resume sessions.</text>
+</svg>
