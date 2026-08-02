@@ -13,8 +13,11 @@ run_id,session_id,provider,original_bytes,bundle_bytes,compression_ratio,export_
 # performance.csv
 run_id,session_count,scan_ms,index_ms,search_p50_ms,search_p95_ms,search_p99_ms,export_ms,import_ms,db_bytes,peak_rss_mb,node_version,os,seed
 
+# tokens.csv
+run_id,session_id,provider,baseline,tokens_used,chars,information_completeness,cross_tool_capable,integrity_validated,portable_artifact,manual_steps,notes,seed
+
 # resume.csv
 run_id,session_id,provider,mode,success,missing_message_rate,manual_steps,time_to_continue_ms,context_tokens,notes,seed
 
-# tokens.csv
-run_id,session_id,provider,baseline,tokens_used,information_completeness,notes,seed
+# baselines-summary.csv
+run_id,baseline,sessions,mean_tokens,median_tokens,mean_completeness,mean_manual_steps,cross_tool_capable,integrity_validated,portable_artifact,token_reduction_vs_full_pct,seed

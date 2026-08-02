@@ -11,9 +11,10 @@ This folder holds experiment definitions, CSV schemas, synthetic corpus tooling,
 | RQ1 | Discovery + normalization accuracy across providers | `bench-discovery`, `bench-fidelity` |
 | RQ2 | Bundle portability / integrity across machines & OS | `bench-portability` |
 | RQ3 | Indexing and search overhead as corpus grows | `bench-performance` |
-| RQ4 | Developer resume effectiveness (time, tokens, success) | human study (see below) |
-| RQ5 | Cross-tool continuation quality | fidelity + resume prompts |
-| RQ6 | Privacy / integrity risks of portable session artifacts | portability corruption tests |
+| RQ4 | Baseline continuation trade-offs (tokens, steps, integrity) | `bench-baselines` |
+| RQ5 | Developer resume effectiveness (time, tokens, success) | human study (see below) |
+| RQ6 | Cross-tool continuation quality | fidelity + resume prompts + baselines |
+| RQ7 | Privacy / integrity risks of portable session artifacts | portability corruption tests |
 
 ## Minimum corpus targets (ITCE)
 

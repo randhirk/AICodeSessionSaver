@@ -26,3 +26,4 @@ jobs:
       - run: node --experimental-strip-types research/scripts/bench-fidelity.ts
       - run: node --experimental-strip-types research/scripts/bench-portability.ts
       - run: node --experimental-strip-types research/scripts/bench-performance.ts
+      - run: node --experimental-strip-types research/scripts/bench-baselines.ts

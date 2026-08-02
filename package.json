@@ -18,7 +18,8 @@
     "research:fidelity": "npm run build && node --experimental-strip-types research/scripts/bench-fidelity.ts",
     "research:portability": "npm run build && node --experimental-strip-types research/scripts/bench-portability.ts",
     "research:performance": "npm run build && node --experimental-strip-types research/scripts/bench-performance.ts",
-    "research:all": "npm run research:generate-corpus && npm run build && node --experimental-strip-types research/scripts/bench-discovery.ts && node --experimental-strip-types research/scripts/bench-fidelity.ts && node --experimental-strip-types research/scripts/bench-portability.ts && node --experimental-strip-types research/scripts/bench-performance.ts"
+    "research:baselines": "npm run build && node --experimental-strip-types research/scripts/bench-baselines.ts",
+    "research:all": "npm run research:generate-corpus && npm run build && node --experimental-strip-types research/scripts/bench-discovery.ts && node --experimental-strip-types research/scripts/bench-fidelity.ts && node --experimental-strip-types research/scripts/bench-portability.ts && node --experimental-strip-types research/scripts/bench-performance.ts && node --experimental-strip-types research/scripts/bench-baselines.ts"
   },
   "keywords": [
     "claude-code",

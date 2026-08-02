@@ -4,7 +4,7 @@
   "seed": 42,
   "count_per_provider": 100,
   "total_sessions": 300,
-  "generated_at": "2026-08-02T00:02:40.840Z",
+  "generated_at": "2026-08-02T00:10:53.000Z",
   "host": {
     "os": "darwin",
     "node": "v25.8.2"
@@ -34,5 +34,71 @@
     { "sessions": 100, "scan_ms": 142.541, "search_p50_ms": 0.0007, "export_p50_ms": 0.137, "import_p50_ms": 0.136, "rss_mb": 94.25 },
     { "sessions": 300, "scan_ms": 142.541, "search_p50_ms": 0.0006, "export_p50_ms": 0.13, "import_p50_ms": 0.12, "rss_mb": 98.59 }
   ],
+  "baselines": {
+    "token_estimator": "chars/4",
+    "rows": [
+      {
+        "baseline": "full_transcript_paste",
+        "mean_tokens": 307.2,
+        "token_reduction_vs_full_pct": 0,
+        "mean_completeness": 0.75,
+        "mean_manual_steps": 3,
+        "cross_tool": true,
+        "integrity": false,
+        "portable": false
+      },
+      {
+        "baseline": "last_10_messages",
+        "mean_tokens": 95.9,
+        "token_reduction_vs_full_pct": 68.8,
+        "mean_completeness": 0.585,
+        "mean_manual_steps": 3,
+        "cross_tool": true,
+        "integrity": false,
+        "portable": false
+      },
+      {
+        "baseline": "heuristic_summary",
+        "mean_tokens": 44.5,
+        "token_reduction_vs_full_pct": 85.5,
+        "mean_completeness": 1.0,
+        "mean_manual_steps": 2,
+        "cross_tool": true,
+        "integrity": false,
+        "portable": false,
+        "note": "High probe completeness; may omit mid-session tool detail not covered by probes"
+      },
+      {
+        "baseline": "aiss_context_prompt",
+        "mean_tokens": 257.2,
+        "token_reduction_vs_full_pct": 16.3,
+        "mean_completeness": 0.9175,
+        "mean_manual_steps": 1.33,
+        "cross_tool": true,
+        "integrity": false,
+        "portable": false
+      },
+      {
+        "baseline": "raw_jsonl_copy",
+        "mean_tokens": 1112.3,
+        "token_reduction_vs_full_pct": -262.1,
+        "mean_completeness": 1.0,
+        "mean_manual_steps": 3,
+        "cross_tool": false,
+        "integrity": false,
+        "portable": true
+      },
+      {
+        "baseline": "aiss_bundle",
+        "mean_tokens": 257.2,
+        "token_reduction_vs_full_pct": 16.3,
+        "mean_completeness": 1.0,
+        "mean_manual_steps": 1.33,
+        "cross_tool": true,
+        "integrity": true,
+        "portable": true
+      }
+    ]
+  },
   "reproduce": "npm run research:generate-corpus -- --count 100 --seed 42 && npm run research:all"
 }

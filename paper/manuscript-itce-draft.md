@@ -1,7 +1,7 @@
 # AISS: A Unified Persistence, Portability, and Recovery Architecture for AI Coding Sessions
 
 **Manuscript draft for** *Information Technologies and Computer Engineering* (ITCE)  
-**Status:** Working draft — results from synthetic corpus (seed=42, n=100/provider)  
+**Status:** Working draft v2 — synthetic corpus + baseline comparisons (seed=42, n=100/provider)  
 **Software:** [AI Code Session Saver (AISS)](https://github.com/randhirk/AICodeSessionSaver) v0.1.0  
 **Prior public background:** Medium article *AI Code Session Saver* (disclose on submission)
 
@@ -9,7 +9,7 @@
 
 ## Abstract
 
-AI coding agents such as Claude Code, Cursor Agent, and Codex CLI store conversational and tool-use context in incompatible on-disk formats and offer uneven resume capabilities. When a terminal closes, a machine changes, or a developer switches tools, prior context is often lost, forcing costly re-explanation. This paper presents **AISS** (AI Code Session Saver), a provider-agnostic architecture for discovering, normalizing, indexing, packaging, and continuing AI coding sessions. AISS contributes (1) a unified session abstraction and extensible adapters, (2) a versioned portable `.aiss` bundle format with lossless raw-source preservation and checksum validation, and (3) a provider-aware continuation model combining native restoration with generated context transfer. We evaluate AISS on a labeled synthetic corpus of **300 sessions** (100 per provider). Discovery achieves precision, recall, and F1 of **1.0** for all providers; normalization yields **0** schema failures and **0** ordering errors; clean export/import round trips succeed for **300/300** sessions with mean compression ratio **0.45**; and randomly corrupted or checksum-tampered bundles are detected in **100/100** cases. Indexing and search overhead remain sub-millisecond at the evaluated scales. We discuss limitations of synthetic evaluation, outline a developer study protocol for interaction claims, and release reproducible benchmark scripts with the open-source implementation.
+AI coding agents such as Claude Code, Cursor Agent, and Codex CLI store conversational and tool-use context in incompatible on-disk formats and offer uneven resume capabilities. When a terminal closes, a machine changes, or a developer switches tools, prior context is often lost, forcing costly re-explanation. This paper presents **AISS** (AI Code Session Saver), a provider-agnostic architecture for discovering, normalizing, indexing, packaging, and continuing AI coding sessions. AISS contributes (1) a unified session abstraction and extensible adapters, (2) a versioned portable `.aiss` bundle format with lossless raw-source preservation and checksum validation, and (3) a provider-aware continuation model combining native restoration with generated context transfer. We evaluate AISS on a labeled synthetic corpus of **300 sessions** (100 per provider) and compare continuation baselines including full transcript paste, last-10 messages, heuristic summaries, raw JSONL copy, and AISS context prompts/bundles. Discovery achieves precision, recall, and F1 of **1.0** for all providers; normalization yields **0** schema failures; clean export/import round trips succeed for **300/300** sessions with mean compression ratio **0.45**; and corrupted bundles are detected in **100/100** cases. Relative to full transcript paste, AISS context prompts reduce estimated tokens by **16.3%** while retaining high probe completeness (**0.92**) and fewer mean manual steps (**1.33** vs **3**). Raw JSONL backups preserve bytes but are not cross-tool resume prompts and lack integrity checks. We discuss synthetic-evaluation limits, outline a developer study protocol for causal productivity claims, and release reproducible benchmarks with the open-source implementation.
 
 **Keywords:** AI coding agents; session persistence; software tooling; interoperability; developer productivity; reproducibility
 
@@ -26,15 +26,16 @@ This fragmentation creates practical failures. Sessions become *orphaned* when i
 - **RQ1.** How accurately can a provider-agnostic layer discover and normalize heterogeneous AI coding sessions?
 - **RQ2.** To what extent can portable bundles preserve session content and detect integrity failures?
 - **RQ3.** What indexing and packaging overhead does unified session management introduce as corpora grow?
-- **RQ4.** (Future / human study) Does session persistence reduce time, effort, and tokens required to resume interrupted AI-assisted work?
+- **RQ4.** How do AISS continuation artifacts compare with common baselines (full paste, last-N, heuristic summary, raw JSONL copy) on tokens, completeness probes, manual steps, cross-tool capability, and integrity?
+- **RQ5.** (Future / human study) Does session persistence reduce wall-clock time and developer effort when resuming interrupted AI-assisted work?
 
 **Contributions.**
 
 1. A provider-independent session model and adapter architecture for Claude Code, Cursor Agent, and Codex CLI.
 2. A versioned `.aiss` artifact format supporting normalized transcripts, raw source embedding, compression, and SHA-256 checksum validation.
 3. A continuation planner that uses native resume commands where available and generated context prompts otherwise.
-4. An open evaluation methodology and synthetic corpus generator with automated discovery, fidelity, portability, and performance benchmarks.
-5. Empirical results on a 300-session labeled corpus demonstrating high discovery fidelity and reliable round-trip portability under the evaluated conditions.
+4. An open evaluation methodology with synthetic corpus generation plus automated discovery, fidelity, portability, performance, and **baseline** benchmarks.
+5. Empirical results on a 300-session labeled corpus showing accurate discovery, reliable portability, and favorable baseline trade-offs for AISS prompts/bundles under the evaluated conditions.
 
 A prior Medium article describes the engineering motivation of AISS for a general audience. This manuscript extends that background with formal research questions, controlled experiments, quantitative results, limitations, and reproducibility artifacts.
 
@@ -149,7 +150,22 @@ Additionally, for 50 sessions we injected random byte corruption and incorrect c
 
 Using the discovered corpus, we measured full scan time and, for subset sizes 10 / 100 / 300, in-memory index construction, search latency percentiles, and median export/import times, along with process RSS.
 
-### 4.6 Reproducibility
+### 4.6 Baseline comparisons (RQ4)
+
+For every discovered session we compared six continuation/backup strategies:
+
+| Baseline | Description |
+|---|---|
+| `full_transcript_paste` | Concatenate all normalized messages into a pasteable prompt |
+| `last_10_messages` | Paste only the last 10 messages |
+| `heuristic_summary` | Compact summary from first user, last assistant, and recent tools |
+| `raw_jsonl_copy` | Copy original provider transcript files |
+| `aiss_context_prompt` | AISS `buildContextPrompt` (last 30 messages + headers) |
+| `aiss_bundle` | Encoded `.aiss` artifact (integrity + portability) |
+
+**Metrics.** Estimated tokens (`ceil(chars/4)`), probe-based information completeness (fraction of session id / project path / first-user / last-assistant snippets retained), coded manual steps, cross-tool capability, integrity validation, and portability. Token estimates are tokenizer-agnostic approximations suitable for relative comparison; absolute counts may differ by provider tokenizer.
+
+### 4.7 Reproducibility
 
 ```bash
 npm ci
@@ -158,7 +174,7 @@ npm run research:generate-corpus -- --count 100 --seed 42
 npm run research:all
 ```
 
-Scripts write CSVs under `research/results/` (gitignored). Aggregate tables in this draft correspond to seed 42 on the host above.
+Scripts write CSVs under `research/results/` (gitignored). Aggregate tables in this draft correspond to seed 42; see `paper/results-summary-itce.json`.
 
 ---
 
@@ -214,6 +230,21 @@ Metadata coverage is below 1.0 primarily because Cursor sessions do not expose a
 
 At these scales, packaging and lookup overhead is negligible relative to interactive AI-agent latency.
 
+### 5.5 Baseline comparisons (RQ4)
+
+**Table 5. Mean continuation/backup trade-offs (n=300 sessions).**
+
+| Baseline | Mean tokens | vs full paste | Completeness | Manual steps | Cross-tool | Integrity | Portable |
+|---|---:|---:|---:|---:|---|---|---|
+| full_transcript_paste | 307.2 | 0% | 0.75 | 3.00 | yes | no | no |
+| last_10_messages | 95.9 | −68.8% | 0.59 | 3.00 | yes | no | no |
+| heuristic_summary | 44.5 | −85.5% | 1.00* | 2.00 | yes | no | no |
+| aiss_context_prompt | 257.2 | −16.3% | 0.92 | 1.33 | yes | no | no |
+| raw_jsonl_copy | 1112.3 | +262.1% | 1.00 | 3.00 | no | no | yes |
+| aiss_bundle | 257.2 | −16.3% | 1.00 | 1.33 | yes | **yes** | **yes** |
+
+\*Heuristic summaries score highly on the short probe set (id/path/first-user/last-assistant) but can omit mid-session tool traces that AISS context retains via the last-30 window. Last-10 paste achieves the largest token cut but the lowest probe completeness (**0.59**), illustrating the risk of aggressive truncation. Only **AISS bundles** combine cross-tool continuation support with checksum integrity validation; raw JSONL copies preserve provider files but are not a normalized, cross-tool resume interface.
+
 ---
 
 ## 6. Discussion
@@ -225,6 +256,8 @@ At these scales, packaging and lookup overhead is negligible relative to interac
 **RQ2.** Lossless raw embedding plus pre-schema checksum verification yields reliable round trips and strong detection of the tested integrity faults. Compression roughly halves on-disk size for the synthetic transcripts.
 
 **RQ3.** Unified scanning of hundreds of sessions remains interactive on a laptop-class host. Larger corpora (thousands to tens of thousands), SQLite query plans, and file-watcher overhead require additional measurement.
+
+**RQ4.** Compared with full paste, AISS context prompts cut estimated tokens by 16.3% while keeping high probe completeness and reducing coded manual steps. Aggressive last-10 truncation saves more tokens but loses completeness. Heuristic summaries are cheapest but are not integrity-checked portable artifacts. Raw JSONL backups are portable at the filesystem level yet provider-locked and larger when measured as text. **AISS bundles uniquely combine portability, integrity validation, and cross-tool continuation support** in this comparison.
 
 ### 6.2 Implications
 
@@ -240,19 +273,22 @@ The Medium article presents the product narrative. This paper adds experimental 
 
 1. **Synthetic corpus.** Transcripts follow current adapter assumptions; real-world format drift, partial writes, and multi-file sessions may reduce accuracy.
 2. **Single host OS.** Results are from macOS; Linux/Windows path and filesystem semantics need explicit multi-OS runs.
-3. **No live baseline comparison yet.** Native resume UX and manual paste baselines are specified but not fully measured in this draft.
-4. **No human-subject results yet.** Productivity, token savings, and usability claims (RQ4) require the protocol in `research/STUDY_PROTOCOL.md`.
-5. **Security evaluation incomplete.** Network isolation, secret redaction, and adversarial import cases are not fully benchmarked.
-6. **Perfect scores risk overfitting.** Near-ceiling metrics on synthetic data should be interpreted as pipeline self-consistency, not final field performance.
+3. **Token estimator.** `chars/4` enables relative comparisons but is not a provider tokenizer.
+4. **Completeness probes.** The probe set is intentionally simple; human-rated information adequacy remains future work (especially for heuristic summaries).
+5. **Manual-step coding.** Step counts are structured estimates from resume plans, not measured stopwatch times.
+6. **No human-subject results yet.** Wall-clock productivity claims (RQ5) require the protocol in `research/STUDY_PROTOCOL.md`.
+7. **Security evaluation incomplete.** Network isolation, secret redaction, and adversarial import cases are not fully benchmarked.
+8. **Ceiling effects.** Near-perfect discovery scores on synthetic data should be read as pipeline self-consistency, not final field performance.
 
 ---
 
 ## 8. Future Work
 
-- Expand corpus to mixed real anonymized sessions under IRB/ethics constraints.
+- Expand corpus to mixed real anonymized sessions under ethics constraints.
 - Add 1k–10k session scaling and persistent index benchmarks.
-- Implement baseline comparisons (native resume, last-N paste, raw JSONL copy).
-- Conduct pilot then powered within-subject developer study.
+- Multi-OS machine-transfer experiments.
+- Replace token estimates with provider tokenizers; add human completeness ratings.
+- Conduct pilot then powered within-subject developer study (RQ5).
 - Strengthen import sandboxing and optional redaction.
 - Additional adapters (Aider, OpenCode, Gemini CLI) and Cursor SQLite resume.
 
@@ -260,7 +296,7 @@ The Medium article presents the product narrative. This paper adds experimental 
 
 ## 9. Conclusion
 
-AISS provides a practical interoperability layer for AI coding sessions across Claude Code, Cursor Agent, and Codex CLI. Controlled experiments on 300 synthetic sessions show accurate discovery, successful lossless packaging, reliable corruption detection, and low runtime overhead. These results support ITCE-oriented claims about software architecture and information processing for AI developer tooling. Completing baseline comparisons and a developer study will strengthen causal claims about productivity and prepare a longer human–AI interaction submission.
+AISS provides a practical interoperability layer for AI coding sessions across Claude Code, Cursor Agent, and Codex CLI. Controlled experiments on 300 synthetic sessions show accurate discovery, successful lossless packaging, reliable corruption detection, low runtime overhead, and baseline trade-offs that favor AISS prompts/bundles when integrity, cross-tool continuation, and reduced manual steps matter. These results support ITCE-oriented claims about software architecture and information processing for AI developer tooling. Completing multi-OS transfers and a developer study will strengthen causal claims about productivity and prepare a longer human–AI interaction submission.
 
 ---
 
@@ -317,10 +353,11 @@ AISS provides a practical interoperability layer for AI coding sessions across C
 ## Appendix B. ITCE submission checklist
 
 - [ ] ≥ ~4,000 words in final camera-ready prose
-- [ ] Abstract 200–300 words (current draft ~180 — expand slightly in polish pass)
+- [x] Abstract 200–300 words
+- [x] Baseline comparison table
 - [ ] ≥ 20 scholarly references with verified metadata
 - [ ] ≤ 12 figures/tables
-- [ ] Reproducible Materials and Methods
+- [x] Reproducible Materials and Methods
 - [ ] Disclose Medium prior publication
 - [ ] Author affiliation / ORCID
 - [ ] Do not submit simultaneously to another journal

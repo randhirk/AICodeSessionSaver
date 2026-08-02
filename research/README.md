@@ -22,6 +22,7 @@ npm run research:discovery
 npm run research:fidelity
 npm run research:portability
 npm run research:performance
+npm run research:baselines
 ```
 
 Results are written to `research/results/*.csv`.
