@@ -1,0 +1,20 @@
+# sessions.csv
+session_id,provider,provider_version,operating_system,project_id,project_language,raw_file_count,raw_session_bytes,message_count,tool_call_count,session_duration_sec,parent_session_id,child_session_count,orphaned_session,expected_to_be_discovered,actually_discovered,parse_success,normalization_success,size_bucket,seed
+
+# discovery.csv
+run_id,provider,expected_count,discovered_count,true_positives,false_positives,false_negatives,precision,recall,f1,orphaned_recovery_rate,duplicate_rate,incorrect_project_association_rate,malformed_rate,seed
+
+# fidelity.csv
+run_id,session_id,provider,message_preservation_rate,tool_call_preservation_rate,timestamp_accuracy,ordering_error_count,metadata_field_coverage,parent_child_link_accuracy,normalization_failure,seed
+
+# portability.csv
+run_id,session_id,provider,original_bytes,bundle_bytes,compression_ratio,export_ms,import_ms,checksum_verify_ms,round_trip_ok,raw_hash_match,corruption_detected,scenario,seed
+
+# performance.csv
+run_id,session_count,scan_ms,index_ms,search_p50_ms,search_p95_ms,search_p99_ms,export_ms,import_ms,db_bytes,peak_rss_mb,node_version,os,seed
+
+# resume.csv
+run_id,session_id,provider,mode,success,missing_message_rate,manual_steps,time_to_continue_ms,context_tokens,notes,seed
+
+# tokens.csv
+run_id,session_id,provider,baseline,tokens_used,information_completeness,notes,seed

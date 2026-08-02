@@ -164,6 +164,7 @@ The file on disk is **gzip-compressed JSON**. Checksum covers all fields except 
 ## Roadmap
 
 - [x] Distilled cross-session project memory + per-session summaries
+- [x] Automated tests + synthetic research corpus / benchmark scripts
 - [ ] Aider, OpenCode, Gemini CLI adapters
 - [ ] Cursor SQLite adapter (full agent-mode resume with checkpoints)
 - [ ] Optional LLM enrichment for memory summaries
@@ -171,6 +172,17 @@ The file on disk is **gzip-compressed JSON**. Checksum covers all fields except 
 - [ ] Git-synced backup directory
 - [ ] Hook integration (capture on session start/end)
 - [ ] Cloud export (S3, Gist)
+- [ ] Full developer productivity study (for ACM TiiS)
+
+## Research / publication tooling
+
+See [`research/`](./research/) for the data collection plan, CSV schemas, synthetic corpus generator, and experiment runners used for journal submissions.
+
+```bash
+npm test
+npm run research:generate-corpus -- --count 30 --seed 42
+npm run research:all
+```
 
 ## Contributing
 

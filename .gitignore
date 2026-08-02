@@ -4,3 +4,8 @@ dist/
 .aiss-data/
 .DS_Store
 *.log
+research/corpus/
+research/results/
+!research/corpus/.gitkeep
+!research/results/.gitkeep
+coverage/

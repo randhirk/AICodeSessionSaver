@@ -34,16 +34,17 @@ export function decodeBundle(buffer: Buffer): AissBundle {
     json = buffer.toString("utf8");
   }
 
-  const parsed = JSON.parse(json) as unknown;
-  const bundle = AissBundleSchema.parse(parsed);
+  const parsed = JSON.parse(json) as Record<string, unknown>;
+  if (typeof parsed.checksum !== "string") {
+    throw new Error("Bundle checksum missing — file may be corrupted");
+  }
 
-  const { checksum, ...rest } = bundle;
-  const expected = sha256(JSON.stringify({ ...rest, checksum: "" }));
-  if (checksum !== expected) {
+  const expected = sha256(JSON.stringify({ ...parsed, checksum: "" }));
+  if (parsed.checksum !== expected) {
     throw new Error("Bundle checksum mismatch — file may be corrupted");
   }
 
-  return bundle;
+  return AissBundleSchema.parse(parsed);
 }
 
 export function encodeToBase64(session: UnifiedSession, rawFiles?: Parameters<typeof encodeSession>[1]): string {

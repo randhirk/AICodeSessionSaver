@@ -10,7 +10,15 @@
     "build": "tsc",
     "dev": "tsx src/cli.ts",
     "start": "node dist/cli.js",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "research:generate-corpus": "node --experimental-strip-types research/scripts/generate-corpus.ts",
+    "research:discovery": "npm run build && node --experimental-strip-types research/scripts/bench-discovery.ts",
+    "research:fidelity": "npm run build && node --experimental-strip-types research/scripts/bench-fidelity.ts",
+    "research:portability": "npm run build && node --experimental-strip-types research/scripts/bench-portability.ts",
+    "research:performance": "npm run build && node --experimental-strip-types research/scripts/bench-performance.ts",
+    "research:all": "npm run research:generate-corpus && npm run build && node --experimental-strip-types research/scripts/bench-discovery.ts && node --experimental-strip-types research/scripts/bench-fidelity.ts && node --experimental-strip-types research/scripts/bench-portability.ts && node --experimental-strip-types research/scripts/bench-performance.ts"
   },
   "keywords": [
     "claude-code",
@@ -33,6 +41,7 @@
   "devDependencies": {
     "@types/node": "^22.13.10",
     "tsx": "^4.19.3",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.2",
+    "vitest": "^3.2.4"
   }
 }

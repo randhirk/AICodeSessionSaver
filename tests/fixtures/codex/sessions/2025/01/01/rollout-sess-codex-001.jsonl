@@ -1,0 +1,5 @@
+{"type":"session_meta","session_meta":{"id":"sess-codex-001","cwd":"/Users/test/demo","parent_thread_id":"sess-codex-parent"},"timestamp":"2025-01-15T11:00:00.000Z"}
+{"type":"turn_context","turn_context":{"model":"gpt-5"},"timestamp":"2025-01-15T11:00:01.000Z"}
+{"type":"event_msg","event_msg":{"type":"user_message","user_message":{"message":"Fix the flaky integration test"}},"timestamp":"2025-01-15T11:00:02.000Z"}
+{"type":"event_msg","event_msg":{"type":"agent_message","agent_message":{"message":"I will inspect the race condition in the queue worker."}},"timestamp":"2025-01-15T11:00:05.000Z"}
+{"type":"response_item","response_item":{"type":"function_call","name":"read_file","input":{"path":"worker.ts"}},"timestamp":"2025-01-15T11:00:06.000Z"}

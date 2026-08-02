@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20, 22]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: npm run research:generate-corpus -- --count 10 --seed 42
+      - run: node --experimental-strip-types research/scripts/bench-discovery.ts
+      - run: node --experimental-strip-types research/scripts/bench-fidelity.ts
+      - run: node --experimental-strip-types research/scripts/bench-portability.ts
+      - run: node --experimental-strip-types research/scripts/bench-performance.ts

@@ -39,5 +39,5 @@ export function codexHome(): string {
 }
 
 export function cursorProjectsDir(): string {
-  return join(homedir(), ".cursor", "projects");
+  return process.env.CURSOR_PROJECTS_DIR ?? join(homedir(), ".cursor", "projects");
 }

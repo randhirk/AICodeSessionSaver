@@ -1,0 +1,5 @@
+{"type":"user","message":{"content":"<user_query>Add unit tests for the auth module</user_query>"},"timestamp":"2025-01-15T10:00:00.000Z","sessionId":"sess-claude-001","cwd":"/Users/test/demo","model":"claude-sonnet-4"}
+{"type":"assistant","message":{"content":[{"type":"text","text":"I will add Vitest coverage for the auth helpers."}]},"timestamp":"2025-01-15T10:00:05.000Z","sessionId":"sess-claude-001","cwd":"/Users/test/demo","model":"claude-sonnet-4"}
+{"type":"tool_use","tool":"Write","input":{"path":"auth.test.ts","content":"test('validates token', () => {})"},"timestamp":"2025-01-15T10:00:10.000Z","sessionId":"sess-claude-001"}
+{"type":"tool_result","tool":"Write","output":"ok","timestamp":"2025-01-15T10:00:12.000Z","sessionId":"sess-claude-001"}
+{"type":"assistant","message":{"content":[{"type":"text","text":"Tests added. Ready for review."}]},"timestamp":"2025-01-15T10:00:15.000Z","sessionId":"sess-claude-001","cwd":"/Users/test/demo","model":"claude-sonnet-4"}
