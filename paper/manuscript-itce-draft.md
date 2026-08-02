@@ -1,7 +1,7 @@
 # AISS: A Unified Persistence, Portability, and Recovery Architecture for AI Coding Sessions
 
 **Manuscript draft for** *Information Technologies and Computer Engineering* (ITCE)  
-**Status:** Working draft v2 — synthetic corpus + baseline comparisons (seed=42, n=100/provider)  
+**Status:** Working draft v3 — expanded systems narrative + baselines (seed=42, n=100/provider); body ≈4,000 words  
 **Software:** [AI Code Session Saver (AISS)](https://github.com/randhirk/AICodeSessionSaver) v0.1.0  
 **Prior public background:** Medium article *AI Code Session Saver* (disclose on submission)
 
@@ -19,7 +19,15 @@ AI coding agents such as Claude Code, Cursor Agent, and Codex CLI store conversa
 
 Large language model (LLM) coding assistants are increasingly embedded in developer workflows through command-line and IDE-integrated agents. These systems maintain rich session state: user intents, assistant plans, tool invocations, filesystem edits, and project-specific constraints. Unlike conventional IDE undo history, this state is often conversational and provider-specific. Claude Code stores JSONL transcripts under hashed project directories with a separate history index; Cursor Agent writes agent transcripts under project-scoped directories; Codex CLI persists rollout JSONL files with session metadata and parent-thread links. Resume mechanisms likewise diverge: some tools support native session IDs, while others require developers to manually reconstruct context.
 
-This fragmentation creates practical failures. Sessions become *orphaned* when index entries diverge from transcript files. Context is trapped on a single machine when developers change laptops. Cross-tool continuation is unsupported even when the underlying engineering task is continuous. The engineering cost appears as repeated prompts, duplicated investigation, and increased token spend—effects that are difficult to measure without a shared representation of sessions.
+This fragmentation creates practical failures that recur in everyday engineering:
+
+1. **Process loss.** Closing a terminal, restarting an IDE, or exhausting a context window can interrupt an agent mid-task even when transcript files remain on disk.
+2. **Index orphans.** Provider history indexes can diverge from transcript files (for example, sessions created by an extension path that never appear in the CLI resume list).
+3. **Machine lock-in.** Changing laptops or moving between office and home machines typically requires rediscovering opaque paths under `~/.claude`, `~/.cursor`, or `~/.codex`.
+4. **Tool switching.** A developer may begin diagnosis in one CLI and continue implementation in another; without a shared representation, context must be retyped.
+5. **Audit and handoff.** Teams rarely treat AI coding sessions as first-class artifacts for backup, incident review, or onboarding, despite their growing role in design decisions.
+
+The engineering cost appears as repeated prompts, duplicated investigation, and increased token spend—effects that are difficult to measure without a shared representation of sessions. Prior work has studied code generation quality, usability of assistants, and agent memory architectures [1–11,21], but comparatively little work addresses *provider-agnostic persistence and portability* of coding-agent sessions as software artifacts.
 
 **Research questions.**
 
@@ -36,8 +44,9 @@ This fragmentation creates practical failures. Sessions become *orphaned* when i
 3. A continuation planner that uses native resume commands where available and generated context prompts otherwise.
 4. An open evaluation methodology with synthetic corpus generation plus automated discovery, fidelity, portability, performance, and **baseline** benchmarks.
 5. Empirical results on a 300-session labeled corpus showing accurate discovery, reliable portability, and favorable baseline trade-offs for AISS prompts/bundles under the evaluated conditions.
+6. A reusable human-study packet (consent, tasks, SUS/NASA-TLX instruments, coding schemas) enabling RQ5 evaluation without proprietary employer code.
 
-A prior Medium article describes the engineering motivation of AISS for a general audience. This manuscript extends that background with formal research questions, controlled experiments, quantitative results, limitations, and reproducibility artifacts.
+A prior Medium article describes the engineering motivation of AISS for a general audience [29]. This manuscript extends that background with formal research questions, controlled experiments, quantitative results, limitations, and reproducibility artifacts. We intentionally separate *systems claims* validated here from *productivity claims* reserved for the human study.
 
 ---
 
@@ -45,21 +54,21 @@ A prior Medium article describes the engineering motivation of AISS for a genera
 
 ### 2.1 AI-assisted programming systems
 
-Research on LLM-based coding assistants spans code completion, conversational repair, agentic tool use, and IDE integration [1–6]. Systems such as Copilot, Claude Code, Cursor, and Codex illustrate production deployments where the assistant operates over repositories with tool access. Prior work emphasizes generation quality, trust, and productivity, but comparatively less attention has been paid to *long-lived session continuity* across process boundaries and tools.
+Research on LLM-based coding assistants spans code completion, conversational repair, agentic tool use, and IDE integration [1–6]. Codex and related models established functional correctness evaluation for synthesized programs [1], while SWE-bench pushed evaluation toward multi-file repository repair [6]. Human studies show that assistants change interaction patterns—acceleration versus exploration modes, verification overhead, and uneven acceptance of suggestions [3–5,21]. Systems such as Copilot, Claude Code, Cursor, and Codex illustrate production deployments where the assistant operates over repositories with tool access. These lines of work primarily ask whether generated code is correct or usable *within* a session. AISS instead asks how session state itself can be discovered, packaged, and restored *across* processes, machines, and tools.
 
 ### 2.2 Conversation and context management
 
-Context window limits motivate summarization, retrieval-augmented memory, and hierarchical memory architectures for agents [7–11]. Distilled project memory in AISS is related to these ideas but is specialized to coding-agent transcripts and local-first storage rather than remote memory services.
+Context window limits motivate summarization, retrieval-augmented memory, and hierarchical memory architectures for agents [7–11]. MemGPT and related OS-inspired designs treat memory as paged state outside the prompt [7]; MemoryBank and RAG surveys emphasize long-term recall via external stores [8,9]. Generative agents and Reflexion show that verbalized memory and self-reflection improve multi-step behavior [10,11]. Distilled project memory in AISS is related to these ideas but is specialized to coding-agent transcripts and local-first storage rather than remote memory services. Critically, AISS treats the *vendor transcript* as the source of truth for lossless recovery, while distilled memory and context prompts are optional continuation aids—not replacements for the original artifact.
 
 ### 2.3 Interoperability and portable artifacts
 
-Software engineering has long used portable formats for build artifacts, containers, and notebooks [12–14]. AISS applies a similar philosophy to AI coding sessions: normalize for interchange, retain originals for lossless recovery, and validate integrity on import.
+Software engineering has long used portable formats for build artifacts, containers, and notebooks [12–14]. Docker popularized reproducible runtime packaging [12]; Jupyter notebooks demonstrated that computational narratives can travel as files [13]; Software Heritage argues for preserving source code as cultural and scientific heritage [14]. AISS applies a similar philosophy to AI coding sessions: normalize for interchange, retain originals for lossless recovery, and validate integrity on import. Unlike notebooks, coding-agent transcripts are heterogeneous JSONL dialects with tool-call semantics and provider-specific resume protocols, which motivates an adapter layer rather than a single file convention.
 
 ### 2.4 Developer tooling evaluation
 
-Empirical SE methods for tool evaluation include controlled tasks, telemetry, and mixed-methods studies [15–17,21]. Our current results focus on systems correctness, performance, and automated baselines; human workload/usability instruments (SUS, NASA-TLX) and the developer protocol are prepared in `research/study/` for RQ5 [24,25].
+Empirical SE methods for tool evaluation include controlled tasks, telemetry, and mixed-methods studies [15–17,21]. Guidelines for empirical SE and controlled experiments with developers inform our planned human evaluation [15–17]. Usability instruments such as SUS and NASA-TLX provide standardized subjective measures [24,25]. Our current results focus on systems correctness, performance, and automated baselines; human workload/usability instruments and the developer protocol are prepared in `research/study/` for RQ5.
 
-Machine-readable bibliography: `paper/references.bib`.
+**Positioning.** To our knowledge, AISS is among the first open systems that (a) normalizes multiple AI coding CLI session formats, (b) ships a checksummed portable bundle with embedded raw sources, and (c) releases reproducible discovery/portability/baseline benchmarks alongside a study packet for continuity tasks.
 
 ---
 
@@ -75,9 +84,13 @@ AISS is implemented as a Node.js CLI (`aiss`) with:
 4. **Resume planner** that emits native commands or continuation prompts.
 5. **Optional distilled memory** that summarizes project-level decisions and per-session outcomes for reuse in new chats.
 
+A typical lifecycle is: `sync` (discover → normalize → index → encode bundles) → `list`/`show` (query) → `export`/`import` (portability) → `resume` (continuation). Optional `watch` mode reacts to filesystem changes in provider transcript roots.
+
 ### 3.2 Unified session model
 
-A session record includes provider, identifiers, project/cwd paths, model (when available), timestamps, ordered messages (user/assistant/system/tool), parent/child connections, resume hints, and source path fingerprints. The schema is validated with Zod to enforce structural invariants used by packaging and resume logic.
+A session record includes provider, identifiers, project/cwd paths, model (when available), timestamps, ordered messages (user/assistant/system/tool), parent/child connections, resume hints, and source path fingerprints. Messages may carry tool names and opaque metadata maps for provider-specific fields that do not yet have first-class schema slots. The schema is validated with Zod to enforce structural invariants used by packaging and resume logic.
+
+Design choices intentionally favor **lossless-enough interchange** over forcing a lowest-common-denominator lossy model. When a provider exposes parent threads (Codex), connections are preserved. When a provider lacks model metadata in the transcript path used by the adapter (Cursor in our current reader), the field remains absent and is reflected in metadata-coverage metrics rather than invented.
 
 ### 3.3 Adapters
 
@@ -87,7 +100,7 @@ A session record includes provider, identifiers, project/cwd paths, model (when 
 | Cursor Agent | `CURSOR_PROJECTS_DIR/*/agent-transcripts/**` | Generated context prompt |
 | Codex CLI | `CODEX_HOME/sessions/**/rollout-*.jsonl` | Native `codex resume` |
 
-Environment overrides (`CLAUDE_CONFIG_DIR`, `CODEX_HOME`, `CURSOR_PROJECTS_DIR`) enable hermetic evaluation without touching a developer’s live home directory.
+Each adapter implements availability checks, watch paths, and discovery. Normalization maps heterogeneous line types (for example, Claude `tool_use`/`tool_result`, Codex `event_msg`/`response_item`, Cursor role/content arrays) into the shared message model. Environment overrides (`CLAUDE_CONFIG_DIR`, `CODEX_HOME`, `CURSOR_PROJECTS_DIR`) enable hermetic evaluation without touching a developer’s live home directory—an essential property for reproducible benchmarks and for CI.
 
 ### 3.4 Portable `.aiss` bundles
 
@@ -98,11 +111,23 @@ A bundle (format `aiss`, version 1) stores:
 - `encodedAt` timestamp;
 - SHA-256 `checksum` over the JSON payload with an empty checksum field.
 
-On-disk encoding is gzip. Decode verifies the checksum against the **raw parsed JSON** before schema normalization, avoiding false mismatches from key reordering during validation.
+On-disk encoding is gzip. Decode verifies the checksum against the **raw parsed JSON** before schema normalization, avoiding false mismatches from key reordering during validation. This dual representation (normalized + raw) supports two audiences: tools that consume the unified model, and humans/providers that may need the exact original transcript for native resume.
 
-### 3.5 Threat model (summary)
+### 3.5 Resume planner and distilled memory
 
-Transcripts may contain source code, secrets, and proprietary prompts. AISS is local-first: indexing and packaging do not require network access. Bundles can be exported explicitly; checksums detect accidental corruption and simple tampering. Full adversarial analysis (zip bombs, path traversal on import, secret redaction accuracy) is future work and is partially specified in the research plan.
+The resume planner branches by provider. For Claude Code, it can optionally restore transcript bytes into the expected project hash directory and append a history entry before printing `claude --resume`. For Codex, it surfaces `codex resume <id>`. For Cursor and unknown providers, it generates a structured continuation prompt containing project/provider identifiers and recent messages, optionally prepended with distilled project memory and the session’s own summary when available.
+
+Distilled memory is a two-layer artifact: project-level decisions/mistakes/status, and per-session summaries. It is designed to be applied into familiar agent instruction files (`CLAUDE.md`, `AGENTS.md`, Cursor rules) so that *new* chats inherit compressed context without pasting entire histories. In this paper’s automated baselines we evaluate context prompts without requiring a live memory build, keeping the comparison focused on session continuity artifacts.
+
+### 3.6 Threat model
+
+Transcripts may contain source code, secrets, filesystem paths, and proprietary prompts. We assume:
+
+- **Assets:** session transcripts, index database, exported bundles, distilled memory files.
+- **Adversaries:** accidental corruption during copy; curious access to a developer machine; maliciously modified bundles received from untrusted channels.
+- **Non-goals (currently):** defending against a fully compromised host OS; cryptographic authenticity of bundles across organizations (no signatures yet); perfect secret redaction.
+
+**Mitigations today.** AISS is local-first: indexing and packaging do not require network access. Bundles are exported only when the user explicitly requests export/import. Checksums detect accidental corruption and simple tampering. **Residual risks.** Decompression bombs, path traversal on import unpacking, symlink abuse, and secret leakage via exported bundles remain future hardening items (Appendix A). Organizations should treat `.aiss` files like source archives: encrypt at rest when needed and avoid posting them to public tickets without review.
 
 ---
 
@@ -165,7 +190,13 @@ For every discovered session we compared six continuation/backup strategies:
 
 **Metrics.** Estimated tokens (`ceil(chars/4)`), probe-based information completeness (fraction of session id / project path / first-user / last-assistant snippets retained), coded manual steps, cross-tool capability, integrity validation, and portability. Token estimates are tokenizer-agnostic approximations suitable for relative comparison; absolute counts may differ by provider tokenizer.
 
-### 4.7 Reproducibility
+We interpret baselines as a *design space*, not as a claim that any single metric dominates. Token reduction without completeness is unsafe; completeness without integrity is fragile for machine transfer; integrity without cross-tool support leaves multi-CLI teams stuck.
+
+### 4.7 Planned human study design (RQ5)
+
+Although this manuscript reports automated results, we include the study design so reviewers can judge readiness for interaction claims. The protocol is a within-subject crossover: each participant uses AISS and a baseline (native resume or manual paste), with counterbalanced order [17]. Pilot size is 5–8 developers; the main study size is determined by power analysis after observing variance. Tasks include resume-after-close, delayed resume, and transfer/cross-tool/orphan variants, using synthetic fixtures only. Objective outcomes include time to first useful action, task success, repeated explanations, and tokens used to re-establish context. Subjective outcomes include SUS and NASA-TLX [24,25] plus continuity/trust Likert items. Consent, scripts, and CSV schemas are published under `research/study/`.
+
+### 4.8 Reproducibility
 
 ```bash
 npm ci
@@ -174,7 +205,7 @@ npm run research:generate-corpus -- --count 100 --seed 42
 npm run research:all
 ```
 
-Scripts write CSVs under `research/results/` (gitignored). Aggregate tables in this draft correspond to seed 42; see `paper/results-summary-itce.json`.
+Scripts write CSVs under `research/results/` (gitignored). Aggregate tables in this draft correspond to seed 42; see `paper/results-summary-itce.json`. Machine-readable bibliography: `paper/references.bib`.
 
 ---
 
@@ -259,13 +290,25 @@ At these scales, packaging and lookup overhead is negligible relative to interac
 
 **RQ4.** Compared with full paste, AISS context prompts cut estimated tokens by 16.3% while keeping high probe completeness and reducing coded manual steps. Aggressive last-10 truncation saves more tokens but loses completeness. Heuristic summaries are cheapest but are not integrity-checked portable artifacts. Raw JSONL backups are portable at the filesystem level yet provider-locked and larger when measured as text. **AISS bundles uniquely combine portability, integrity validation, and cross-tool continuation support** in this comparison.
 
-### 6.2 Implications
+### 6.2 Implications for practitioners and tool builders
 
-A portable session layer can decouple *developer continuity* from *vendor storage formats*. Organizations adopting multiple AI CLIs can treat sessions as first-class artifacts for backup, audit, and handoff—subject to privacy controls.
+For individual developers, AISS offers a practical habit: synchronize after major agent sessions, export `.aiss` bundles before machine changes, and prefer generated context prompts when native resume is unavailable. For teams adopting multiple AI CLIs, a shared session layer reduces “tool tribalism” where knowledge is trapped in one vendor’s directory tree. For CLI vendors, the results argue for stable, documented transcript schemas and first-class export APIs; adapters are a stopgap when formats remain undocumented or unstable.
 
-### 6.3 Relation to prior public description
+From a software-architecture perspective, treating sessions as versioned artifacts enables backup policies analogous to repository mirrors: retain raw sources, validate checksums, and separate normalized indexes from export packages. Distilled memory then becomes a derived view—useful for prompt injection, but not a substitute for archival fidelity.
 
-The Medium article presents the product narrative. This paper adds experimental methodology, quantitative tables, limitations, and reusable scripts. Submission cover letters should disclose the prior article and emphasize the new empirical material.
+### 6.3 Threats to validity
+
+**Construct validity.** Token estimates and probe completeness are proxies for “useful context,” not human judgments of resumability. Manual-step counts are coded from resume plans, not observed stopwatch workflows.
+
+**Internal validity.** Perfect discovery scores partly reflect that the synthetic generator emits formats the adapters already understand. This is appropriate for regression testing and pipeline self-consistency, but it can overstate field robustness.
+
+**External validity.** Results are from macOS, Node v25.8.2, and three providers at specific transcript dialects. Other OSes, provider versions, and partially written files may differ. Human productivity effects remain unmeasured until the study packet is executed.
+
+**Conclusion validity.** We report descriptive aggregates for the full synthetic population rather than inferential statistics over a sampled human population. When RQ5 data arrive, paired tests with effect sizes will be required [16,17].
+
+### 6.4 Relation to prior public description
+
+The Medium article presents the product narrative [29]. This paper adds experimental methodology, quantitative tables, limitations, and reusable scripts. Submission cover letters should disclose the prior article and emphasize the new empirical material.
 
 ---
 
@@ -284,19 +327,13 @@ The Medium article presents the product narrative. This paper adds experimental 
 
 ## 8. Future Work
 
-- Expand corpus to mixed real anonymized sessions under ethics constraints.
-- Add 1k–10k session scaling and persistent index benchmarks.
-- Multi-OS machine-transfer experiments.
-- Replace token estimates with provider tokenizers; add human completeness ratings.
-- Conduct pilot then powered within-subject developer study (RQ5).
-- Strengthen import sandboxing and optional redaction.
-- Additional adapters (Aider, OpenCode, Gemini CLI) and Cursor SQLite resume.
+Beyond executing the pilot and powered developer study (RQ5), several technical extensions are natural. First, multi-OS machine-transfer experiments should quantify whether path encoding and filesystem semantics affect discovery or import. Second, scaling benchmarks at 1k–10k sessions should stress the persistent index, watcher overhead, and search latency under realistic home-directory corpora. Third, replacing `chars/4` estimates with provider tokenizers—and adding human completeness ratings—would tighten RQ4 construct validity. Fourth, import sandboxing (size limits, path normalization, symlink rejection) and optional secret redaction would strengthen the threat model. Fifth, additional adapters (Aider, OpenCode, Gemini CLI) and deeper Cursor SQLite resume would broaden coverage as the ecosystem evolves. Finally, mixed real anonymized sessions under ethics constraints would test format drift that synthetic data cannot capture.
 
 ---
 
 ## 9. Conclusion
 
-AISS provides a practical interoperability layer for AI coding sessions across Claude Code, Cursor Agent, and Codex CLI. Controlled experiments on 300 synthetic sessions show accurate discovery, successful lossless packaging, reliable corruption detection, low runtime overhead, and baseline trade-offs that favor AISS prompts/bundles when integrity, cross-tool continuation, and reduced manual steps matter. These results support ITCE-oriented claims about software architecture and information processing for AI developer tooling. Completing multi-OS transfers and a developer study will strengthen causal claims about productivity and prepare a longer human–AI interaction submission.
+AISS provides a practical interoperability layer for AI coding sessions across Claude Code, Cursor Agent, and Codex CLI. Controlled experiments on 300 synthetic sessions show accurate discovery, successful lossless packaging, reliable corruption detection, low runtime overhead, and baseline trade-offs that favor AISS prompts/bundles when integrity, cross-tool continuation, and reduced manual steps matter. These results support ITCE-oriented claims about software architecture and information processing for AI developer tooling: session state can be engineered as a portable, checkable artifact rather than an opaque side effect of each vendor CLI. Completing multi-OS transfers and a developer study will strengthen causal claims about productivity and prepare a longer human–AI interaction submission for venues that require controlled user evaluation.
 
 ---
 
