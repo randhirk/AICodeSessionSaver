@@ -180,9 +180,11 @@ See [`research/`](./research/) for the data collection plan, CSV schemas, synthe
 
 ```bash
 npm test
-npm run research:generate-corpus -- --count 30 --seed 42
+npm run research:generate-corpus -- --count 100 --seed 42
 npm run research:all
 ```
+
+ITCE manuscript draft and aggregate result tables: [`paper/`](./paper/).
 
 ## Contributing
 

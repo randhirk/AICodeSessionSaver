@@ -1,0 +1,38 @@
+{
+  "venue_target": "ITCE",
+  "software_version": "0.1.0",
+  "seed": 42,
+  "count_per_provider": 100,
+  "total_sessions": 300,
+  "generated_at": "2026-08-02T00:02:40.840Z",
+  "host": {
+    "os": "darwin",
+    "node": "v25.8.2"
+  },
+  "discovery": {
+    "claude-code": { "precision": 1, "recall": 1, "f1": 1, "orphan_recovery": 1 },
+    "cursor": { "precision": 1, "recall": 1, "f1": 1, "orphan_recovery": 1 },
+    "codex": { "precision": 1, "recall": 1, "f1": 1, "orphan_recovery": 1 }
+  },
+  "fidelity": {
+    "sessions": 300,
+    "schema_failures": 0,
+    "ordering_errors": 0,
+    "mean_timestamp_accuracy": 1,
+    "mean_metadata_coverage": 0.9167,
+    "parent_child_link_accuracy": 1
+  },
+  "portability": {
+    "clean_round_trips_ok": "300/300",
+    "mean_compression_ratio": 0.4521,
+    "mean_export_ms": 0.159,
+    "mean_import_ms": 0.159,
+    "corruption_detected": "100/100"
+  },
+  "performance": [
+    { "sessions": 10, "scan_ms": 142.541, "search_p50_ms": 0.0007, "export_p50_ms": 0.171, "import_p50_ms": 0.23, "rss_mb": 87.06 },
+    { "sessions": 100, "scan_ms": 142.541, "search_p50_ms": 0.0007, "export_p50_ms": 0.137, "import_p50_ms": 0.136, "rss_mb": 94.25 },
+    { "sessions": 300, "scan_ms": 142.541, "search_p50_ms": 0.0006, "export_p50_ms": 0.13, "import_p50_ms": 0.12, "rss_mb": 98.59 }
+  ],
+  "reproduce": "npm run research:generate-corpus -- --count 100 --seed 42 && npm run research:all"
+}
