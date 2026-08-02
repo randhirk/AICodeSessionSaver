@@ -57,9 +57,9 @@ Software engineering has long used portable formats for build artifacts, contain
 
 ### 2.4 Developer tooling evaluation
 
-Empirical SE methods for tool evaluation include controlled tasks, telemetry, and mixed-methods studies [15–18]. Our current results focus on systems correctness and performance; Section 8 specifies a within-subject protocol for productivity claims needed by human–AI interaction venues.
+Empirical SE methods for tool evaluation include controlled tasks, telemetry, and mixed-methods studies [15–17,21]. Our current results focus on systems correctness, performance, and automated baselines; human workload/usability instruments (SUS, NASA-TLX) and the developer protocol are prepared in `research/study/` for RQ5 [24,25].
 
-*(Reference list is expanded in Section 11; finalize DOIs and page numbers before submission.)*
+Machine-readable bibliography: `paper/references.bib`.
 
 ---
 
@@ -276,7 +276,7 @@ The Medium article presents the product narrative. This paper adds experimental 
 3. **Token estimator.** `chars/4` enables relative comparisons but is not a provider tokenizer.
 4. **Completeness probes.** The probe set is intentionally simple; human-rated information adequacy remains future work (especially for heuristic summaries).
 5. **Manual-step coding.** Step counts are structured estimates from resume plans, not measured stopwatch times.
-6. **No human-subject results yet.** Wall-clock productivity claims (RQ5) require the protocol in `research/STUDY_PROTOCOL.md`.
+6. **No human-subject results yet.** Wall-clock productivity claims (RQ5) require running `research/study/` (consent, tasks, SUS/NASA-TLX).
 7. **Security evaluation incomplete.** Network isolation, secret redaction, and adversarial import cases are not fully benchmarked.
 8. **Ceiling effects.** Near-perfect discovery scores on synthetic data should be read as pipeline self-consistency, not final field performance.
 
@@ -305,40 +305,46 @@ AISS provides a practical interoperability layer for AI coding sessions across C
 - Source code: https://github.com/randhirk/AICodeSessionSaver  
 - License: MIT  
 - Reproduction: `research/DATA_COLLECTION_PLAN.md`, `npm run research:all`  
-- Aggregate results for this draft: `paper/results-summary-itce.json`
+- Human-study packet: `research/study/`  
+- Aggregate results for this draft: `paper/results-summary-itce.json`  
+- Bibliography: `paper/references.bib`
 
 ---
 
-## 11. References (draft set — verify before submission)
+## 11. References
 
-1. Chen, M., et al. Evaluating Large Language Models Trained on Code. arXiv:2107.03374, 2021.
-2. Fried, D., et al. InCoder: A Generative Model for Code Infilling and Synthesis. ICLR, 2023.
-3. Barke, S., et al. Grounded Copilot: How Programmers Interact with Code-Generating Models. PACMPL, 2023.
-4. Vaithilingam, P., et al. Expectation vs. Experience: Evaluating the Usability of Code Generation Tools. CHI, 2022.
-5. Mozannar, H., et al. Reading Between the Lines: Modeling User Behavior Improves Code Generation. NeurIPS, 2024.
-6. Jimenez, C. E., et al. SWE-bench: Can Language Models Resolve Real-World GitHub Issues? ICLR, 2024.
-7. Packer, C., et al. MemGPT: Towards LLMs as Operating Systems. arXiv:2310.08560, 2023.
-8. Zhong, W., et al. MemoryBank: Enhancing Large Language Models with Long-Term Memory. AAAI, 2024.
-9. Xu, F., et al. Retrieval-Augmented Generation for Large Language Models: A Survey. arXiv:2312.10997, 2023.
-10. Park, J. S., et al. Generative Agents: Interactive Simulacra of Human Behavior. UIST, 2023.
-11. Shinn, N., et al. Reflexion: Language Agents with Verbal Reinforcement Learning. NeurIPS, 2023.
-12. Merkel, D. Docker: Lightweight Linux Containers for Consistent Development and Deployment. Linux Journal, 2014.
-13. Kluyver, T., et al. Jupyter Notebooks—a publishing format for reproducible computational workflows. ELPUB, 2016.
-14. Di Cosmo, R., Zacchiroli, S. Software Heritage: Why and How to Preserve Software Source Code. iPRES, 2017.
-15. Kitchenham, B. A., et al. Preliminary Guidelines for Empirical Research in Software Engineering. IEEE TSE, 2002.
-16. Wohlin, C., et al. Experimentation in Software Engineering. Springer, 2012.
-17. Ko, A. J., et al. A Practical Guide to Controlled Experiments of Software Engineering Tools. IST, 2015?
-18. Storey, M.-A., et al. How Software Developers Mitigate Collaboration Friction. CSCW/related SE venue — replace with exact cite.
-19. Bird, C., et al. The Art and Science of Analyzing Software Data. Morgan Kaufmann, 2015.
-20. Sadowski, C., Zimmermann, T. Rethinking Productivity in Software Engineering. Apress, 2019.
-21. Weisz, J. D., et al. Perfection Not Required? Human-AI Partnerships in Code Translation. IUI, 2021.
-22. Liang, J. T., et al. A Large-Scale Survey of Developers’ AI Assistant Usage. ICSE/FSE related — verify.
-23. Ross, S. I., et al. The Programmer’s Assistant: Conversational Interaction with a Large Language Model for Software Development. IUI, 2023.
-24. Nam, D., et al. Using an LLM to Help With Code Understanding. ICSE, 2024.
-25. Anthropic. Claude Code documentation (session storage / resume). Retrieved 2026.
-26. Cursor. Agent / project transcript documentation. Retrieved 2026.
-27. OpenAI. Codex CLI documentation (resume / rollouts). Retrieved 2026.
-28. Kumar, R. AI Code Session Saver (Medium article). 2026. Prior public background.
+1. Chen, M., Tworek, J., Jun, H., Yuan, Q., et al. (2021). Evaluating large language models trained on code. *arXiv:2107.03374*.
+2. Fried, D., Aghajanyan, A., Lin, J., Wang, S., et al. (2023). InCoder: A generative model for code infilling and synthesis. *ICLR*.
+3. Barke, S., James, M. B., & Polikarpova, N. (2023). Grounded Copilot: How programmers interact with code-generating models. *PACMPL*, 7(OOPSLA1). https://doi.org/10.1145/3586030
+4. Vaithilingam, P., Zhang, T., & Glassman, E. L. (2022). Expectation vs. experience: Evaluating the usability of code generation tools powered by large language models. *CHI EA ’22*. https://doi.org/10.1145/3491101.3519665
+5. Mozannar, H., Bansal, G., Fourney, A., & Horvitz, E. (2024). Reading between the lines: Modeling user behavior and costs in AI-assisted programming. *CHI ’24*. https://doi.org/10.1145/3613904.3641936
+6. Jimenez, C. E., Yang, J., Wettig, A., Yao, S., Pei, K., Press, O., & Narasimhan, K. R. (2024). SWE-bench: Can language models resolve real-world GitHub issues? *ICLR*.
+7. Packer, C., Wooders, S., Lin, K., Fang, V., et al. (2023). MemGPT: Towards LLMs as operating systems. *arXiv:2310.08560*.
+8. Zhong, W., Guo, L., Gao, Q., Ye, H., & Wang, Y. (2024). MemoryBank: Enhancing large language models with long-term memory. *AAAI*.
+9. Gao, Y., Xiong, Y., Gao, X., Jia, K., et al. (2023). Retrieval-augmented generation for large language models: A survey. *arXiv:2312.10997*.
+10. Park, J. S., O’Brien, J., Cai, C. J., Morris, M. R., Liang, P., & Bernstein, M. S. (2023). Generative agents: Interactive simulacra of human behavior. *UIST ’23*. https://doi.org/10.1145/3586183.3606763
+11. Shinn, N., Cassano, F., Gopinath, A., Narasimhan, K., & Yao, S. (2023). Reflexion: Language agents with verbal reinforcement learning. *NeurIPS*.
+12. Merkel, D. (2014). Docker: Lightweight Linux containers for consistent development and deployment. *Linux Journal*, 2014(239).
+13. Kluyver, T., Ragan-Kelley, B., Pérez, F., Granger, B., et al. (2016). Jupyter Notebooks—a publishing format for reproducible computational workflows. In *Positioning and Power in Academic Publishing*.
+14. Di Cosmo, R., & Zacchiroli, S. (2017). Software Heritage: Why and how to preserve software source code. *iPRES*.
+15. Kitchenham, B. A., Pfleeger, S. L., Pickard, L. M., Jones, P. W., Hoaglin, D. C., El Emam, K., & Rosenberg, J. (2002). Preliminary guidelines for empirical research in software engineering. *IEEE TSE*, 28(8), 721–734. https://doi.org/10.1109/TSE.2002.1027796
+16. Wohlin, C., Runeson, P., Höst, M., Ohlsson, M. C., Regnell, B., & Wesslén, A. (2012). *Experimentation in Software Engineering*. Springer.
+17. Ko, A. J., LaToza, T. D., & Burnett, M. M. (2015). A practical guide to controlled experiments of software engineering tools with human participants. *Empirical Software Engineering*, 20(1), 110–141. https://doi.org/10.1007/s10664-013-9279-3
+18. Bird, C., Menzies, T., & Zimmermann, T. (2015). *The Art and Science of Analyzing Software Data*. Morgan Kaufmann.
+19. Sadowski, C., & Zimmermann, T. (Eds.). (2019). *Rethinking Productivity in Software Engineering*. Apress.
+20. Weisz, J. D., Muller, M., Houde, S., Richards, J., Ross, S. I., Martinez, F., Agarwal, M., & Talamadupula, K. (2021). Perfection not required? Human–AI partnerships in code translation. *IUI ’21*, 402–412. https://doi.org/10.1145/3397481.3450656
+21. Liang, J. T., Yang, C., & Myers, B. A. (2024). A large-scale survey on the usability of AI programming assistants: Successes and challenges. *ICSE ’24*. https://doi.org/10.1145/3597503.3608128
+22. Ross, S. I., Martinez, F., Houde, S., Muller, M., & Weisz, J. D. (2023). The Programmer’s Assistant: Conversational interaction with a large language model for software development. *IUI ’23*. https://doi.org/10.1145/3581641.3584037
+23. Nam, D., Macvean, A., Hellendoorn, V., Vasilescu, B., & Myers, B. (2024). Using an LLM to help with code understanding. *ICSE ’24*. https://doi.org/10.1145/3597503.3639187
+24. Brooke, J. (1996). SUS: A “quick and dirty” usability scale. In *Usability Evaluation in Industry*. Taylor & Francis.
+25. Hart, S. G., & Staveland, L. E. (1988). Development of NASA-TLX (Task Load Index). *Advances in Psychology*, 52, 139–183.
+26. Anthropic. (2026). Claude Code documentation (session storage / resume). Accessed 2026-08-01.
+27. Cursor. (2026). Cursor documentation (agent transcripts / projects). Accessed 2026-08-01.
+28. OpenAI. (2026). Codex CLI documentation (resume / rollouts). Accessed 2026-08-01.
+29. Kumar, R. (2026). AI Code Session Saver. *Medium*. Prior public background. https://medium.com/@randhirkr_34313/ai-code-session-saver-hero-4b6ca8bc35ea
+30. Kumar, R. (2026). AI Code Session Saver (AISS) [Computer software]. https://github.com/randhirk/AICodeSessionSaver
+
+Machine-readable BibTeX: `paper/references.bib`.
 
 ---
 
@@ -355,9 +361,10 @@ AISS provides a practical interoperability layer for AI coding sessions across C
 - [ ] ≥ ~4,000 words in final camera-ready prose
 - [x] Abstract 200–300 words
 - [x] Baseline comparison table
-- [ ] ≥ 20 scholarly references with verified metadata
+- [x] ≥ 20 scholarly references with verified metadata (BibTeX + DOIs where available)
+- [x] Developer study materials packet (`research/study/`)
 - [ ] ≤ 12 figures/tables
 - [x] Reproducible Materials and Methods
-- [ ] Disclose Medium prior publication
+- [ ] Disclose Medium prior publication in cover letter
 - [ ] Author affiliation / ORCID
 - [ ] Do not submit simultaneously to another journal

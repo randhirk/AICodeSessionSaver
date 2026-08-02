@@ -6,6 +6,8 @@ dist/
 *.log
 research/corpus/
 research/results/
+research/study/data/raw/*
+!research/study/data/raw/.gitkeep
 !research/corpus/.gitkeep
 !research/results/.gitkeep
 coverage/

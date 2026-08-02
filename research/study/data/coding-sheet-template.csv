@@ -1,0 +1,7 @@
+participant_id,condition,task_id,task_type,success,time_to_first_useful_action_ms,time_to_first_correct_edit_ms,task_completion_time_ms,repeated_explanations_count,repeated_commands_count,incorrect_ai_assumptions_count,defects_introduced,prompt_tokens_to_reestablish_context,transcript_searches,manual_recovery_steps,gave_up,notes
+P01,aiss,T1,terminal_close,,,,,,,,,,,,,,,,
+P01,aiss,T2,delayed_resume,,,,,,,,,,,,,,,,
+P01,aiss,T3,orphan_recovery,,,,,,,,,,,,,,,,
+P01,baseline_native_or_paste,T1,terminal_close,,,,,,,,,,,,,,,,
+P01,baseline_native_or_paste,T2,delayed_resume,,,,,,,,,,,,,,,,
+P01,baseline_native_or_paste,T3,cross_tool,,,,,,,,,,,,,,,,

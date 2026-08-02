@@ -1,0 +1,9 @@
+participant_id,order_group,condition_1,condition_2,fixture_set
+P01,AB,aiss,baseline_native_or_paste,set1
+P02,BA,baseline_native_or_paste,aiss,set1
+P03,AB,aiss,baseline_native_or_paste,set2
+P04,BA,baseline_native_or_paste,aiss,set2
+P05,AB,aiss,baseline_native_or_paste,set1
+P06,BA,baseline_native_or_paste,aiss,set2
+P07,AB,aiss,baseline_native_or_paste,set2
+P08,BA,baseline_native_or_paste,aiss,set1
